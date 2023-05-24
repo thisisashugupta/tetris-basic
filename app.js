@@ -14,12 +14,12 @@ addEventListener("DOMContentLoaded", (event) => {
     [0 * width + 1, 1 * width + 1, 2 * width + 1, 0 * width + 2],
     [1 * width + 0, 1 * width + 1, 1 * width + 2, 2 * width + 2],
     [0 * width + 1, 1 * width + 1, 2 * width + 1, 2 * width + 0],
-    [1 * width + 0, 2 * width + 0, 2 * width + 1, 2 * width + 2],
+    [0 * width + 0, 1 * width + 0, 1 * width + 1, 1 * width + 2],
   ];
 
   const zTetromino = [
-    [width + 1, 2 * width, width + 2, 2 * width + 1],
-    [width + 1, 2 * width, 1, 2 * width + 1],
+    [1, 2, width, width + 1],
+    [0, width, width + 1, 2 * width + 1],
   ];
 
   const oTetromino = [[width, 2 * width, width + 1, 2 * width + 1]];
@@ -116,6 +116,9 @@ addEventListener("DOMContentLoaded", (event) => {
     if (event.key === "ArrowDown") {
       moveDown();
     }
+    if (event.key === "ArrowUp") {
+      rotate();
+    }
   }
 
   function moveLeft() {
@@ -148,15 +151,22 @@ addEventListener("DOMContentLoaded", (event) => {
   function rotate() {
     let newRotation = (rotation + 1) % theTetrominos[shape].length;
     let newTetromino = theTetrominos[shape][newRotation];
-
+    // check if all new places are empty
     if (
       newTetromino.some((index) =>
         squares[currentPosition + index].classList.contains("frozen")
       )
     )
       return;
+    // if after rotation some are in leftmost col and some are in rightmost col then dont rotate
+    const isAtLeftEdge = newTetromino.some(
+      (index) => (currentPosition + index) % 10 === 0
+    );
+    const isAtRightEdge = newTetromino.some(
+      (index) => (currentPosition + index) % 10 === 9
+    );
+    if (isAtLeftEdge && isAtRightEdge) return;
 
-    // check if all new places are empty
     undraw();
     rotation = newRotation;
     currentTetromino = theTetrominos[shape][rotation];
