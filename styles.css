@@ -1,0 +1,25 @@
+.grid {
+  width: 220px;
+  height: 440px;
+  background-color: yellow;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.tetromino {
+  background-color: blueviolet;
+}
+
+.frozen {
+  background-color: lightblue;
+}
+
+.taken {
+  background-color: black;
+}
+
+.grid div {
+  width: 20px;
+  height: 20px;
+  border: 1px solid black;
+}
