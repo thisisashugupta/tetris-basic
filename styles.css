@@ -1,9 +1,34 @@
+.container {
+  display: flex;
+}
+
 .grid {
   width: 220px;
   height: 440px;
   background-color: yellow;
   display: flex;
   flex-wrap: wrap;
+}
+
+.grid div {
+  width: 20px;
+  height: 20px;
+  border: 1px solid black;
+}
+
+.mini-grid {
+  margin-left: 50px;
+  width: 88px;
+  height: 88px;
+  background-color: yellow;
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.mini-grid div {
+  width: 20px;
+  height: 20px;
+  border: 1px solid black;
 }
 
 .tetromino {
@@ -16,10 +41,4 @@
 
 .taken {
   background-color: black;
-}
-
-.grid div {
-  width: 20px;
-  height: 20px;
-  border: 1px solid black;
 }

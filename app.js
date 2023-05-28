@@ -17,12 +17,17 @@ addEventListener("DOMContentLoaded", (event) => {
     [0 * width + 0, 1 * width + 0, 1 * width + 1, 1 * width + 2],
   ];
 
-  const zTetromino = [
+  const z1Tetromino = [
     [1, 2, width, width + 1],
     [0, width, width + 1, 2 * width + 1],
   ];
 
-  const oTetromino = [[width, 2 * width, width + 1, 2 * width + 1]];
+  const z2Tetromino = [
+    [0, 1, width + 1, width + 2],
+    [2, width + 2, width + 1, 2 * width + 1],
+  ];
+
+  const oTetromino = [[1, 2, width + 1, width + 2]];
 
   const tTetromino = [
     [1, width, width + 1, width + 2],
@@ -32,13 +37,14 @@ addEventListener("DOMContentLoaded", (event) => {
   ];
 
   const iTetromino = [
-    [1, width + 1, 2 * width + 1, 3 * width + 1],
-    [width, width + 1, width + 2, width + 3],
+    [0, width, 2 * width, 3 * width],
+    [0, 1, 2, 3],
   ];
 
   const theTetrominos = [
     lTetromino,
-    zTetromino,
+    z1Tetromino,
+    z2Tetromino,
     oTetromino,
     tTetromino,
     iTetromino,
@@ -57,7 +63,10 @@ addEventListener("DOMContentLoaded", (event) => {
           squares[currentPosition + index + width].classList.contains(
             "taken"
           ) ||
-          squares[currentPosition + index + width].classList.contains("frozen")
+          squares[currentPosition + index + width].classList.contains(
+            "frozen"
+          ) ||
+          squares[currentPosition + index].classList.contains("frozen")
       )
     ) {
       freeze();
@@ -78,9 +87,72 @@ addEventListener("DOMContentLoaded", (event) => {
   }
 
   function freeze() {
-    currentTetromino.forEach((index) =>
-      squares[currentPosition + index].classList.add("frozen")
-    );
+    currentTetromino.forEach((index) => {
+      squares[currentPosition + index].classList.add("frozen");
+      squares[currentPosition + index].classList.remove("tetromino");
+    });
+  }
+
+  function shiftDown() {
+    for (let line = squares.length - 2 * width; line > 0; line -= width) {
+      let lineEmpty = true;
+      for (let index = line; index < line + width; index++) {
+        // check for complete emptiness
+        if (squares[index].classList.contains("frozen")) {
+          lineEmpty = false;
+          break;
+        }
+      }
+      if (lineEmpty) {
+        for (let index = line; index < line + width; index++) {
+          // if above cell is frozen
+          if (squares[index - width].classList.contains("frozen")) {
+            // then make the current cell as frozen
+            squares[index].classList.add("frozen");
+            // and make the above cell as free
+            squares[index - width].classList.remove("frozen");
+          }
+        }
+      }
+    }
+  }
+
+  function removeFilledLinesAndShiftDown() {
+    for (let line = 0; line < squares.length - width; line += width) {
+      let filled = true;
+      for (let index = line; index < line + width; index++) {
+        // if filled
+        filled = filled && squares[index].classList.contains("frozen");
+      }
+      if (filled) {
+        for (let index = line; index < line + width; index++) {
+          squares[index].classList.remove("frozen");
+        }
+      }
+    }
+    shiftDown();
+  }
+
+  function removeBottomMostFilledLine() {
+    // if for all cells of a particular line, all the cells are frozen
+    let filled = true;
+    for (let i = squares.length - 2 * width; i < squares.length - width; i++) {
+      filled = filled && squares[i].classList.contains("frozen");
+    }
+    console.log(filled);
+    if (!filled) return;
+
+    for (let i = squares.length - 3 * width; i >= 0; i -= width) {
+      for (let index = i; index < i + width; index++) {
+        let bool = squares[index].classList.contains("frozen");
+
+        if (bool) squares[index + width].classList.add("frozen");
+        else {
+          squares[index + width].classList.remove("frozen");
+          squares[index + width].classList.remove("tetromino");
+        }
+      }
+    }
   }
 
   function moveDown() {
@@ -102,6 +174,8 @@ addEventListener("DOMContentLoaded", (event) => {
     undraw();
     currentPosition += width;
     draw();
+    // removeBottomMostFilledLine();
+    removeFilledLinesAndShiftDown();
   }
 
   document.addEventListener("keydown", control);
@@ -152,12 +226,10 @@ addEventListener("DOMContentLoaded", (event) => {
     let newRotation = (rotation + 1) % theTetrominos[shape].length;
     let newTetromino = theTetrominos[shape][newRotation];
     // check if all new places are empty
-    if (
-      newTetromino.some((index) =>
-        squares[currentPosition + index].classList.contains("frozen")
-      )
-    )
-      return;
+    const overlapping = newTetromino.some((index) =>
+      squares[currentPosition + index].classList.contains("frozen")
+    );
+    if (overlapping) return;
     // if after rotation some are in leftmost col and some are in rightmost col then dont rotate
     const isAtLeftEdge = newTetromino.some(
       (index) => (currentPosition + index) % 10 === 0
@@ -175,13 +247,26 @@ addEventListener("DOMContentLoaded", (event) => {
 
   let shape, rotation, currentPosition, currentTetromino;
 
+  // * * * * * * * * * * * * * * * * UP NEXT GRID * * * * * * * * * * * * * * * *
+
+  const displaySquares = document.querySelectorAll(".mini-grid div");
+  const miniWidth = 4;
+  const miniIndex = 0;
+
+  const upNextTetrominos = [
+    [1, miniWidth + 1, 2 * miniWidth + 1, 2], // l
+    [1, 2, miniWidth, miniWidth + 1], //z
+    [1, 2, miniWidth + 1, miniWidth + 2], // o
+    [1, miniWidth, miniWidth + 1, miniWidth + 2], //t
+    [0, 1, 2, 3], // i
+  ];
+
   // * * * * * * * * * * * * * * * * LOGIC OF THE GAME * * * * * * * * * * * * * * * *
 
   makeNewTertomino();
   console.log(currentTetromino);
 
   draw();
-  // setInterval(undraw, delay);
   setInterval(moveDown, delay);
 
   // onDOMContentLoaded = (event) => {};
