@@ -7,9 +7,12 @@
     <title>Basic Tetris</title>
   </head>
   <body>
-    <p>
-      <button id="start-button">Start</button>Score:<span id="score">0</span>
-    </p>
+    <div class="buttons"><button id="start-button">Start</button></div>
+    <div class="scores">
+      <div>Score: <span id="score"></span></div>
+      <div><span id="game-over"></span></div>
+      <div>High Score: <span id="high-score"></span></div>
+    </div>
     <div class="container">
       <div class="grid">
         <div></div>
@@ -242,6 +245,15 @@
         <div></div>
         <div></div>
         <div></div>
+      </div>
+    </div>
+
+    <div class="buttons">
+      <div id="up-btn">↑</div>
+      <div class="second-line">
+        <div id="left-btn">←</div>
+        <div id="down-btn">↓</div>
+        <div id="right-btn">→</div>
       </div>
     </div>
   </body>
